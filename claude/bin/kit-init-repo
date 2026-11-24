@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Set up the beads tracker and specs/ folder in a git repo (default: current one).
+# It is idempotent and safe to re-run.
+set -euo pipefail
+repo="${1:-$(git rev-parse --show-toplevel)}"
+cd "$repo"
+kit="$HOME/.claude/kit"
+command -v bd >/dev/null || npm install -g --silent @beads/bd
+
+if [ ! -d .beads ]; then
+  prefix="$(basename "$repo" | tr -cd '[:alnum:]' | tr '[:upper:]' '[:lower:]' | cut -c1-8)"
+  bd init --non-interactive --skip-agents --skip-hooks --prefix "${prefix:-wk}" >/dev/null 2>&1
+fi
+git config beads.role maintainer
+chmod 700 .beads 2>/dev/null || true
+bd config set export.path issues.jsonl >/dev/null 2>&1 || true
+bd config set import.path issues.jsonl >/dev/null 2>&1 || true
+bd export -o .beads/issues.jsonl >/dev/null 2>&1 || true
+
+if [ ! -d specs ]; then
+  mkdir -p specs
+  cp "$kit/templates/spec_template.md" specs/_template.md
+  cp "$kit/templates/specs_README.md" specs/README.md
+fi
+echo "kit-init-repo: tracker + specs ready in $repo (prefix: $(bd config get issue_prefix 2>/dev/null || echo '?')). Commit .beads/ and specs/."

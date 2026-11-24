@@ -4,7 +4,8 @@ A global Claude Code workflow. The main session is a thin **orchestrator** that 
 
 ## Install (once per machine; in the cloud, the environment setup script does it)
 ```bash
-git clone <this repo> ~/claude-kit && ~/claude-kit/install.sh
+git clone https://github.com/zenyh/claude-kit ~/claude-kit
+bash ~/claude-kit/install.sh   # on Windows: run in Git Bash
 ```
 It installs `bd` (`npm i -g @beads/bd`) and writes the following into `~/.claude/`: a marked block in `CLAUDE.md`, the agents `implementer`, `reviewer` and `tester`, the skills `/next`, `/idea` and `/wrap`, and SessionStart/Stop hooks in `settings.json`. Re-run it to update. It touches only its own files.
 
@@ -18,4 +19,4 @@ Talk normally. Useful phrases: "what's next?" (`/next`), "add an issue: …" (`/
 Open questions for you are labelled `decision`, and the orchestrator brings them up.
 
 ## Layout
-`claude/CLAUDE.md` holds the orchestrator rules · `claude/agents/` the worker agents · `claude/skills/` the slash skills · `claude/hooks/` the hooks · `claude/bin/kit-init-repo` the per-repo setup · `templates/` the spec template and index.
+`claude/CLAUDE.md` holds the orchestrator rules · `claude/agents/` the worker agents · `claude/skills/` the slash skills · `claude/hooks/` the hooks · `claude/bin/kit-init-repo` the per-repo setup (run as `bash ~/.claude/kit/bin/kit-init-repo`) · `templates/` the spec template and index.

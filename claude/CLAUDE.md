@@ -23,7 +23,7 @@ The user wants this workflow in every project. They should never have to remembe
 - When the user mentions an idea or problem in passing, file it (`bd q "…"`), say "filed as <id>", and carry on.
 - Keep notes terse: what changed, what failed and why, follow-up IDs. No logs or diffs.
 - Useful commands: `bd ready`, `bd show <id>`, `bd list --status open`, `bd list -l decision`, `bd blocked`, `bd search <text>`. Use `--json` when you parse output.
-- If the SessionStart context says this repo has no tracker, set one up quietly with `kit-init-repo` before filing the first issue. Mention it in one line.
+- If the SessionStart context says this repo has no tracker, set one up quietly with `bash ~/.claude/kit/bin/kit-init-repo` before filing the first issue. Mention it in one line.
 
 ## Specs: `specs/` is the source of truth for what exists
 - `specs/<feature>.md` describes one feature as it works now: purpose, surfaces (pages, routes, commands), user actions, data, rules and edge cases. Follow the shape in `specs/_template.md`. `specs/README.md` is the index.

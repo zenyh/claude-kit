@@ -8,6 +8,16 @@ into context. It never fails the session: errors become one line of context.
 """
 import json, os, shutil, subprocess, sys
 
+try:
+    sys.stdout.reconfigure(encoding="utf-8")
+except Exception:  # noqa: BLE001
+    pass
+
+
+def exe(name):
+    """Full path to a command; needed on Windows for npm/bd .cmd shims."""
+    return shutil.which(name) or name
+
 MAX_READY = 8
 
 
@@ -20,7 +30,7 @@ def run(cmd, cwd=None, timeout=60):
 
 
 def bd_json(args, cwd):
-    code, out = run(["bd", *args, "--json"], cwd=cwd)
+    code, out = run([exe("bd"), *args, "--json"], cwd=cwd)
     if code != 0:
         return []
     try:
@@ -34,12 +44,12 @@ def ensure_bd():
     if shutil.which("bd"):
         return True
     if shutil.which("npm"):
-        run(["npm", "install", "-g", "--silent", "@beads/bd"], timeout=180)
+        run([exe("npm"), "install", "-g", "--silent", "@beads/bd"], timeout=180)
     return bool(shutil.which("bd"))
 
 
 def git_root(path):
-    code, out = run(["git", "-C", path, "rev-parse", "--show-toplevel"], timeout=10)
+    code, out = run([exe("git"), "-C", path, "rev-parse", "--show-toplevel"], timeout=10)
     return out.strip() if code == 0 else None
 
 
@@ -61,14 +71,14 @@ def find_repos(cwd):
 
 def restore_db(repo):
     beads = os.path.join(repo, ".beads")
-    run(["git", "-C", repo, "config", "beads.role", "maintainer"], timeout=10)
+    run([exe("git"), "-C", repo, "config", "beads.role", "maintainer"], timeout=10)
     try:
         os.chmod(beads, 0o700)
     except OSError:
         pass
     has_db = any(os.path.isdir(os.path.join(beads, d)) for d in ("embeddeddolt", "dolt"))
     if not has_db:
-        run(["bd", "bootstrap", "-y"], cwd=repo, timeout=120)
+        run([exe("bd"), "bootstrap", "-y"], cwd=repo, timeout=120)
 
 
 def line(i):
@@ -115,13 +125,13 @@ def main():
         return
     repos = find_repos(cwd)
     if not repos:
-        lines.append("Not in a git repository: no issue tracker here. Just chat. If the user starts a project, `git init` it and run `kit-init-repo`.")
+        lines.append("Not in a git repository: no issue tracker here. Just chat. If the user starts a project, `git init` it and run `bash ~/.claude/kit/bin/kit-init-repo`.")
     for repo in repos:
         if os.path.isdir(os.path.join(repo, ".beads")):
             restore_db(repo)
             lines += status(repo)
         else:
-            lines.append(f"## {os.path.basename(repo)} ({repo}): no issue tracker yet. Run `kit-init-repo {repo}` before filing the first issue (no need to ask).")
+            lines.append(f"## {os.path.basename(repo)} ({repo}): no issue tracker yet. Run `bash ~/.claude/kit/bin/kit-init-repo '{repo}'` before filing the first issue (no need to ask).")
     print("\n".join(lines))
 
 
